@@ -1,0 +1,21 @@
+footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 60px;
+  line-height: 60px;
+  background-color: #f5f5f5;
+  border-top: 1px solid grey;
+}
+
+form,
+#results {
+  background-color: #f5f5f5;
+  border-radius: 15px;
+}
+
+#submitButton {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}

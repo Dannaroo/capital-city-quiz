@@ -1,0 +1,2 @@
+-always entering else if 'correct!'
+-remove old button and append new button to reset quiz.
