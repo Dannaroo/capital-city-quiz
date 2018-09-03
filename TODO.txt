@@ -2,3 +2,4 @@
 -remove old button and append new button to reset quiz.
 -add mobile responsiveness
 -add score counter using Local Storage
+-fix sticky footer

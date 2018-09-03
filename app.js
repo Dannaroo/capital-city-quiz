@@ -94,4 +94,5 @@ const xhr = new XMLHttpRequest();
       appendCountryName(countryObject);
       countryUlData(countryObject);
       formDiv.style.display = "";
+      cityNameInput.value = "";
     });
