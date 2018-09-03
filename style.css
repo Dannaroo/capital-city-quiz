@@ -8,14 +8,41 @@ footer {
   border-top: 1px solid grey;
 }
 
-form,
-#results {
+h1 {
+  text-shadow: .1rem .1rem .4rem blue;
+}
+
+form {
   background-color: #f5f5f5;
   border-radius: 15px;
+  box-shadow: .2rem .2rem;
 }
 
 #submitButton {
   display: block;
   margin-left: auto;
   margin-right: auto;
+}
+
+#resultDiv {
+  box-shadow: .2rem .2rem;
+}
+
+.resultDivSuccess {
+  color: #155724;
+  background-color: #c3e6cb;
+  border-radius: 15px;
+}
+
+.resultDivFailure {
+  color: #721c24;
+  background-color: #f5c6cb;
+  border-radius: 15px;
+}
+
+#countryUl {
+  min-width: 15rem;
+  max-width: 20rem;
+  margin: 4rem auto;
+  box-shadow: .6rem .6rem .2rem black;
 }

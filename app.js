@@ -4,6 +4,11 @@ const submitButton = document.querySelector('#submitButton');
 let listJSON = [];
 const errorMessage = document.querySelector('#errorMessage');
 let countryObject = {};
+const resultDiv = document.querySelector('#resultDiv');
+resultDivText = resultDiv.querySelector('p');
+const formDiv = document.querySelector('#formDiv');
+const playAgainButton = document.querySelector('#playAgainButton');
+const countryUl = resultDiv.querySelector('#countryUl');
 
 //get a random number and return the corresponding country/city object pair matching that number in the json list
 function getRandomObject() {
@@ -22,6 +27,17 @@ function appendCountryName(countryObject) {
   countryName.textContent = countryObject.Country;
 }
 
+function countryUlData(countryObject) {
+  countryUl.firstElementChild.innerHTML = "<strong>Country:</strong> " + countryObject.Country;
+  countryUl.firstElementChild.nextElementSibling.innerHTML = "<strong>Capital City:</strong> " + countryObject["Capital City"];
+  if(countryObject.Notes !== "") {
+    countryUl.lastElementChild.innerHTML = "<strong>Notes:</strong> " + countryObject.Notes;
+    countryUl.lastElementChild.style.display = "";
+  } else {
+    countryUl.lastElementChild.style.display = "none";
+  }
+}
+
 //Use AJAX to get the country/city values from the JSON file
 const xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function () {
@@ -33,6 +49,7 @@ const xhr = new XMLHttpRequest();
           //   }
           countryObject = getRandomObject();
           appendCountryName(countryObject);
+          countryUlData(countryObject);
 
         } else if (xhr.status === 404) {
             //file not found
@@ -51,15 +68,30 @@ const xhr = new XMLHttpRequest();
 
     submitButton.addEventListener('click', (event) => {
       event.preventDefault();
-      let userResponse = cityNameInput.value;
+      let userResponse = cityNameInput.value.toUpperCase();
+      console.log(userResponse);
+      console.log(countryObject["Capital City"]);
       if(userResponse === "") {
         errorMessage.textContent = "Please enter a city name."
         errorMessage.style.display = "";
-      } else if(userResponse = countryObject["Capital City"]) {
-        errorMessage.style.display = "";
-        errorMessage.textContent = "Correct!"
+      } else if(userResponse === countryObject["Capital City"].toUpperCase()) {
+        formDiv.style.display = "none";
+        resultDiv.style.display = "";
+        resultDivText.textContent = "Correct!"
+        resultDiv.className = "resultDivSuccess text-center m-5 p-4";
       } else {
-        errorMessage.style.display = "";
-        errorMessage.textContent = "Sorry, the correct answer is: " + countryObject["Capital City"];
+        formDiv.style.display = "none";
+        resultDiv.style.display = "";
+        resultDivText.textContent = "Sorry, the correct answer is: " + countryObject["Capital City"];
+        resultDiv.className = "resultDivFailure text-center m-5 p-4";
       }
+    });
+
+    playAgainButton.addEventListener('click', (event) => {
+      event.preventDefault();
+      resultDiv.style.display = "none";
+      countryObject = getRandomObject();
+      appendCountryName(countryObject);
+      countryUlData(countryObject);
+      formDiv.style.display = "";
     });

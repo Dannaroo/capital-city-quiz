@@ -1,2 +1,4 @@
 -always entering else if 'correct!'
 -remove old button and append new button to reset quiz.
+-add mobile responsiveness
+-add score counter using Local Storage

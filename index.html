@@ -26,14 +26,24 @@
 
           <div class="row">
             <div class="container">
-              <form class="mt-5">
+              <form id="formDiv" class="mt-5">
                 <div class="form-group text-center m-5 pt-5 pb-4">
                   <label class="font-weight-bold" for="search">What is the Capital City Of <span id="country-name"></span>?</label>
                   <input class="form-control text-center" type="search" name="city-name" id="city-name-input" placeholder="City-Name">
-                  <span id="errorMessage" style="display: none" class="rounded p-1 m-1 bg-danger text-white"></span>
+                  <p id="errorMessage" style="display: none" class="rounded p-1 m-1 bg-danger text-white"></p>
                   <input class="btn btn-primary mt-3 mb-3" type="submit" value="Submit" id="submitButton">
                 </div>
               </form>
+              <div id="resultDiv" class="text-center m-5 pt-5 pb-4" style="display: none">
+                <p></p>
+                <ul id="countryUl" class="list-group">
+                  <li class="list-group-item list-group-item-info"></li>
+                  <li class="list-group-item list-group-item-info"></li>
+                  <li class="list-group-item list-group-item-info" style="display: none"></li>
+                </ul>
+                <button id="playAgainButton" type="button" class="btn btn-primary">Play Again</button>
+
+              </div>
             </div>
           </div><!-- /Row1 -->
         </div><!-- /Container  -->
