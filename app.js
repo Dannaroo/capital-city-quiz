@@ -5,10 +5,44 @@ let listJSON = [];
 const errorMessage = document.querySelector('#errorMessage');
 let countryObject = {};
 const resultDiv = document.querySelector('#resultDiv');
-resultDivText = resultDiv.querySelector('p');
+const resultDivText = resultDiv.querySelector('p');
 const formDiv = document.querySelector('#formDiv');
 const playAgainButton = document.querySelector('#playAgainButton');
 const countryUl = resultDiv.querySelector('#countryUl');
+const introDiv = document.querySelector('#introDiv');
+const startButton = introDiv.querySelector('#startButton');
+const playerName = introDiv.querySelector('#playerName');
+let playerCount = [];
+const counterDiv = document.querySelector('#counterDiv');
+
+//check if the user's broswer supports Local Storage
+function supportsLocalStorage() {
+  try {
+  return 'localStorage' in window && window['localStorage'] !== null;
+} catch(e) {
+  return false;
+}
+}
+
+function getExistingLocalData(name) {
+    playerCount = localStorage.getItem('playerData');
+    if(playerCount) {
+      return JSON.parse(playerCount);
+    } else {
+      return [
+        {}
+      ];
+    }
+  }
+
+  function addPlayerNameToStorage(name) {
+    const objectName = {
+      'Name' : name
+    }
+    playerCount.push(objectName);
+    localStorage.setItem('playerData', JSON.stringify(playerCount));
+  }
+
 
 //get a random number and return the corresponding country/city object pair matching that number in the json list
 function getRandomObject() {
@@ -65,6 +99,24 @@ const xhr = new XMLHttpRequest();
     // xhr.open('GET', 'https://raw.githubusercontent.com/Dannaroo/capital-city-quiz/gh-pages/country-city-list.json');
     xhr.open('GET', 'country-city-list.json');
     xhr.send();
+
+    startButton.addEventListener('click', (event) => {
+      event.preventDefault();
+      introDiv.style.display = "none";
+      formDiv.style.display = "";
+      if(supportsLocalStorage) {
+        if(playerName.value !== "") {
+          playerCount = getExistingLocalData();
+          if(!playerCount.Name) {
+            addPlayerNameToStorage(playerName.value);
+          }
+
+        } else {
+          playerCount = getExistingLocalData();
+        }
+
+      }// supports Local Storage
+    });
 
     submitButton.addEventListener('click', (event) => {
       event.preventDefault();

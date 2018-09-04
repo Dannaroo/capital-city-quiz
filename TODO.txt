@@ -1,5 +1,6 @@
--always entering else if 'correct!'
--remove old button and append new button to reset quiz.
 -add mobile responsiveness
 -add score counter using Local Storage
 -fix sticky footer
+-scroll bar appearing for no reason-FIXED LINE HEIGHT
+-parse capital strings with ' ('
+-easy/medium/hard feedback
