@@ -103,7 +103,7 @@ const xhr = new XMLHttpRequest();
     startButton.addEventListener('click', (event) => {
       event.preventDefault();
       introDiv.style.display = "none";
-      formDiv.style.display = "";
+      formDiv.style.display = "block";
       if(supportsLocalStorage) {
         if(playerName.value !== "") {
           playerCount = getExistingLocalData();
