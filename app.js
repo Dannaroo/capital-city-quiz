@@ -24,24 +24,30 @@ function supportsLocalStorage() {
 }
 }
 
-function getExistingLocalData(name) {
+function getExistingLocalData(playerName) {
     playerCount = localStorage.getItem('playerData');
     if(playerCount) {
       return JSON.parse(playerCount);
     } else {
-      return [
-        {}
-      ];
+      playerCount = {
+        'name' : playerName,
+        'correct' : 0,
+        'incorrect' : 0
+      }
+      localStorage.setItem('playerData', JSON.stringify(playerCount));
+      return playerCount;
     }
   }
 
-  function addPlayerNameToStorage(name) {
-    const objectName = {
-      'Name' : name
-    }
-    playerCount.push(objectName);
-    localStorage.setItem('playerData', JSON.stringify(playerCount));
+function addPlayerNameToStorage(playerName) {
+  const objectName = {
+    'name' : playerName,
+    'correct' : 0,
+    'incorrect' : 0,
   }
+  playerCount.push(objectName);
+  localStorage.setItem('playerData', JSON.stringify(playerCount));
+}
 
 
 //get a random number and return the corresponding country/city object pair matching that number in the json list
@@ -74,77 +80,83 @@ function countryUlData(countryObject) {
 
 //Use AJAX to get the country/city values from the JSON file
 const xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function () {
-      if (xhr.readyState === 4) {
-        if (xhr.status === 200) {
-          listJSON = JSON.parse(xhr.responseText);
-          // for (let i = 0; i < listJSON.length; i += 1) {
-          //   constlistJSON[0].Country;
-          //   }
-          countryObject = getRandomObject();
-          appendCountryName(countryObject);
-          countryUlData(countryObject);
-
-        } else if (xhr.status === 404) {
-            //file not found
-            console.log("error: file not found")
-            alert(xhr.statusText);
-        } else {
-            //server had a problem
-            console.log("error: server had a problem")
-            alert(xhr.statusText);
-        }
-      }
-    };
-    // xhr.open('GET', 'https://raw.githubusercontent.com/Dannaroo/capital-city-quiz/gh-pages/country-city-list.json');
-    xhr.open('GET', 'country-city-list.json');
-    xhr.send();
-
-    startButton.addEventListener('click', (event) => {
-      event.preventDefault();
-      introDiv.style.display = "none";
-      formDiv.style.display = "block";
-      if(supportsLocalStorage) {
-        if(playerName.value !== "") {
-          playerCount = getExistingLocalData();
-          if(!playerCount.Name) {
-            addPlayerNameToStorage(playerName.value);
-          }
-
-        } else {
-          playerCount = getExistingLocalData();
-        }
-
-      }// supports Local Storage
-    });
-
-    submitButton.addEventListener('click', (event) => {
-      event.preventDefault();
-      let userResponse = cityNameInput.value.toUpperCase();
-      console.log(userResponse);
-      console.log(countryObject["Capital City"]);
-      if(userResponse === "") {
-        errorMessage.textContent = "Please enter a city name."
-        errorMessage.style.display = "";
-      } else if(userResponse === countryObject["Capital City"].toUpperCase()) {
-        formDiv.style.display = "none";
-        resultDiv.style.display = "";
-        resultDivText.textContent = "Correct!"
-        resultDiv.className = "resultDivSuccess text-center m-5 p-4";
-      } else {
-        formDiv.style.display = "none";
-        resultDiv.style.display = "";
-        resultDivText.textContent = "Sorry, the correct answer is: " + countryObject["Capital City"];
-        resultDiv.className = "resultDivFailure text-center m-5 p-4";
-      }
-    });
-
-    playAgainButton.addEventListener('click', (event) => {
-      event.preventDefault();
-      resultDiv.style.display = "none";
+xhr.onreadystatechange = function () {
+  if (xhr.readyState === 4) {
+    if (xhr.status === 200) {
+      listJSON = JSON.parse(xhr.responseText);
+      // for (let i = 0; i < listJSON.length; i += 1) {
+      //   constlistJSON[0].Country;
+      //   }
       countryObject = getRandomObject();
       appendCountryName(countryObject);
       countryUlData(countryObject);
-      formDiv.style.display = "";
-      cityNameInput.value = "";
-    });
+
+    } else if (xhr.status === 404) {
+        //file not found
+        console.log("error: file not found")
+        alert(xhr.statusText);
+    } else {
+        //server had a problem
+        console.log("error: server had a problem")
+        alert(xhr.statusText);
+    }
+  }
+};
+xhr.open('GET', 'https://raw.githubusercontent.com/Dannaroo/capital-city-quiz/gh-pages/country-city-list.json');
+// xhr.open('GET', 'country-city-list.json');
+xhr.send();
+
+startButton.addEventListener('click', (event) => {
+  event.preventDefault();
+  introDiv.style.display = "none";
+  formDiv.style.display = "block";
+  if(supportsLocalStorage) {
+      playerCount = getExistingLocalData(playerName.value);
+      counterDiv.style.display = "";
+      counterDiv.firstElementChild.firstElementChild.textContent = playerCount.name;
+      counterDiv.firstElementChild.firstElementChild.nextElementSibling.textContent = (playerCount.correct + playerCount.incorrect);
+      counterDiv.firstElementChild.firstElementChild.nextElementSibling.nextElementSibling.textContent = playerCount.correct;
+      counterDiv.firstElementChild.lastElementChild.previousElementSibling.textContent = playerCount.incorrect;
+      counterDiv.firstElementChild.lastElementChild.textContent = ((playerCount.correct / (playerCount.correct + playerCount.incorrect)) * 100);
+
+  }// supports Local Storage
+});
+
+submitButton.addEventListener('click', (event) => {
+  event.preventDefault();
+  let userResponse = cityNameInput.value.toUpperCase();
+  console.log(userResponse);
+  console.log(countryObject["Capital City"]);
+  let correctCity = countryObject["Capital City"]
+  //check if the correct city has ' (' in the name and remove if it does.
+  if(correctCity.indexOf(' (') != -1) {
+    const slicedNameIndex = correctCity.indexOf(' (');
+    const slicedName = correctCity.slice(0, slicedNameIndex);
+    correctCity = slicedName;
+    console.log(slicedName);
+  }
+  if(userResponse === "") {
+    errorMessage.textContent = "Please enter a city name."
+    errorMessage.style.display = "";
+  } else if(userResponse === correctCity.toUpperCase()) {
+    formDiv.style.display = "none";
+    resultDiv.style.display = "";
+    resultDivText.textContent = "Correct!"
+    resultDiv.className = "resultDivSuccess text-center m-5 p-4";
+  } else {
+    formDiv.style.display = "none";
+    resultDiv.style.display = "";
+    resultDivText.textContent = "Sorry, the correct answer is: " + countryObject["Capital City"];
+    resultDiv.className = "resultDivFailure text-center m-5 p-4";
+  }
+});
+
+playAgainButton.addEventListener('click', (event) => {
+  event.preventDefault();
+  resultDiv.style.display = "none";
+  countryObject = getRandomObject();
+  appendCountryName(countryObject);
+  countryUlData(countryObject);
+  formDiv.style.display = "";
+  cityNameInput.value = "";
+});

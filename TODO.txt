@@ -1,6 +1,8 @@
--add mobile responsiveness
+-add mobile responsiveness- DONE
 -add score counter using Local Storage
--fix sticky footer
+-fix sticky footer- DONE
 -scroll bar appearing for no reason-FIXED LINE HEIGHT
 -parse capital strings with ' ('
--easy/medium/hard feedback
+-easy/medium/hard feedback-DONE, still to add serverside code.
+-create multiple choice answers
+-do not repeat questions
