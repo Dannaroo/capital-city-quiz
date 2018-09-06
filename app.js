@@ -100,7 +100,6 @@ function getRandomObject() {
   for(i = 0; i < listJSON.length; i += 1) {
     const objectNum = listJSON[i].SNo;
     if(randomNum === objectNum) {
-      console.log(listJSON[i]);
       return listJSON[i];
     }
   }
@@ -175,20 +174,18 @@ startButton.addEventListener('click', (event) => {
 submitButton.addEventListener('click', (event) => {
   event.preventDefault();
   let userResponse = cityNameInput.value.toUpperCase();
-  console.log(userResponse);
-  console.log(countryObject["Capital City"]);
   let correctCity = countryObject["Capital City"]
   //check if the correct city has ' (' in the name and remove if it does.
   if(correctCity.indexOf(' (') != -1) {
     const slicedNameIndex = correctCity.indexOf(' (');
     const slicedName = correctCity.slice(0, slicedNameIndex);
     correctCity = slicedName;
-    console.log(slicedName);
   }
   if(userResponse === "") {
     errorMessage.textContent = "Please enter a city name."
     errorMessage.style.display = "";
   } else if(userResponse === correctCity.toUpperCase()) {
+    errorMessage.style.display = "none";
     formDiv.style.display = "none";
     resultDiv.style.display = "";
     resultDivText.textContent = "Correct!"
@@ -197,6 +194,7 @@ submitButton.addEventListener('click', (event) => {
     updateLocalStorage(playerCount);
     updateCounterDiv();
   } else {
+    errorMessage.style.display = "none";
     formDiv.style.display = "none";
     resultDiv.style.display = "";
     resultDivText.textContent = "Sorry, the correct answer is: " + countryObject["Capital City"];
