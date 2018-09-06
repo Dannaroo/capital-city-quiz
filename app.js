@@ -14,6 +14,10 @@ const startButton = introDiv.querySelector('#startButton');
 const playerName = introDiv.querySelector('#playerName');
 let playerCount = [];
 const counterDiv = document.querySelector('#counterDiv');
+const modalNameSpan = document.querySelector('#modalNameSpan');
+const newPlayerButton = document.querySelector('#newPlayerButton');
+const nameErrorMessage = document.querySelector('#nameErrorMessage');
+const cancelModals = document.querySelectorAll('.cancelModal');
 
 //check if the user's broswer supports Local Storage
 function supportsLocalStorage() {
@@ -39,14 +43,53 @@ function getExistingLocalData(playerName) {
     }
   }
 
-function addPlayerNameToStorage(playerName) {
-  const objectName = {
-    'name' : playerName,
-    'correct' : 0,
-    'incorrect' : 0,
-  }
-  playerCount.push(objectName);
+function updateLocalStorage(playerCount) {
   localStorage.setItem('playerData', JSON.stringify(playerCount));
+}
+
+function updateCounterDiv() {
+  counterDiv.style.display = "";
+  counterDiv.firstElementChild.firstElementChild.textContent = 'Player: ' + playerCount.name;
+  counterDiv.firstElementChild.firstElementChild.nextElementSibling.textContent = 'Questions Answered: ' + (playerCount.correct + playerCount.incorrect);
+  counterDiv.firstElementChild.firstElementChild.nextElementSibling.nextElementSibling.textContent = 'Questions Correct: ' +  playerCount.correct;
+  counterDiv.firstElementChild.lastElementChild.previousElementSibling.textContent = 'Questions Incorrect: ' +  playerCount.incorrect;
+  if(counterDiv.firstElementChild.firstElementChild.nextElementSibling.textContent !== 'Questions Answered: 0') {
+    counterDiv.firstElementChild.lastElementChild.textContent = 'Win Percentage: ' + ((playerCount.correct / (playerCount.correct + playerCount.incorrect)) * 100).toFixed(2) + '%';
+  }
+}
+
+// If playerData already exists, display their name on the intro page
+function existingPlayer() {
+  if(playerCount.name) {
+    const nameBox = document.createElement('div');
+    nameBox.textContent = 'You are currently playing as ' + playerCount.name;
+    nameBox.className = 'text-center nameBox text-success';
+    introDiv.firstElementChild.nextElementSibling.nextElementSibling.insertBefore(nameBox, introDiv.firstElementChild.nextElementSibling.nextElementSibling.firstElementChild);
+  }
+}
+
+//if the player enters a different name in the name box, prompt them if they want to create a new player.
+function resetPlayerData() {
+  if(playerName.value !== "" && playerName.value !== playerCount.name) {
+    modalNameSpan.textContent = playerCount.name;
+    $('#myModal').modal('show');
+    newPlayerButton.addEventListener('click', () => {
+      localStorage.removeItem('playerData');
+      playerCount = getExistingLocalData(playerName.value);
+      introDiv.style.display = "none";
+      formDiv.style.display = "block";
+      $('#myModal').modal('hide');
+      updateCounterDiv();
+    });
+    for(i = 0; i < cancelModals.length; i+= 1) {
+      cancelModals[i].addEventListener('click', () => {
+        playerName.value = "";
+      });
+    }
+  } else {
+    introDiv.style.display = "none";
+    formDiv.style.display = "block";
+  }
 }
 
 
@@ -106,18 +149,25 @@ xhr.open('GET', 'https://raw.githubusercontent.com/Dannaroo/capital-city-quiz/gh
 // xhr.open('GET', 'country-city-list.json');
 xhr.send();
 
+if(supportsLocalStorage) {
+  playerCount = JSON.parse(localStorage.getItem('playerData'));
+  if(playerCount) {
+    existingPlayer();
+  }
+}
+
 startButton.addEventListener('click', (event) => {
   event.preventDefault();
-  introDiv.style.display = "none";
-  formDiv.style.display = "block";
+  if(playerName.value === "" && !playerCount) {
+    nameErrorMessage.style.display = "";
+    return;
+  }
   if(supportsLocalStorage) {
-      playerCount = getExistingLocalData(playerName.value);
-      counterDiv.style.display = "";
-      counterDiv.firstElementChild.firstElementChild.textContent = playerCount.name;
-      counterDiv.firstElementChild.firstElementChild.nextElementSibling.textContent = (playerCount.correct + playerCount.incorrect);
-      counterDiv.firstElementChild.firstElementChild.nextElementSibling.nextElementSibling.textContent = playerCount.correct;
-      counterDiv.firstElementChild.lastElementChild.previousElementSibling.textContent = playerCount.incorrect;
-      counterDiv.firstElementChild.lastElementChild.textContent = ((playerCount.correct / (playerCount.correct + playerCount.incorrect)) * 100);
+    playerCount = getExistingLocalData(playerName.value);
+    resetPlayerData();
+    updateCounterDiv();
+
+
 
   }// supports Local Storage
 });
@@ -143,11 +193,17 @@ submitButton.addEventListener('click', (event) => {
     resultDiv.style.display = "";
     resultDivText.textContent = "Correct!"
     resultDiv.className = "resultDivSuccess text-center m-5 p-4";
+    playerCount.correct += 1;
+    updateLocalStorage(playerCount);
+    updateCounterDiv();
   } else {
     formDiv.style.display = "none";
     resultDiv.style.display = "";
     resultDivText.textContent = "Sorry, the correct answer is: " + countryObject["Capital City"];
     resultDiv.className = "resultDivFailure text-center m-5 p-4";
+    playerCount.incorrect += 1;
+    updateLocalStorage(playerCount);
+    updateCounterDiv();
   }
 });
 
@@ -159,4 +215,5 @@ playAgainButton.addEventListener('click', (event) => {
   countryUlData(countryObject);
   formDiv.style.display = "";
   cityNameInput.value = "";
+
 });
