@@ -18,6 +18,9 @@ const modalNameSpan = document.querySelector('#modalNameSpan');
 const newPlayerButton = document.querySelector('#newPlayerButton');
 const nameErrorMessage = document.querySelector('#nameErrorMessage');
 const cancelModals = document.querySelectorAll('.cancelModal');
+const skipAndFailButton = document.querySelector('#skipAndFailButton');
+const backtoIntroButton = document.querySelector('#backToIntro');
+let randomNumList = [];
 
 //check if the user's broswer supports Local Storage
 function supportsLocalStorage() {
@@ -28,6 +31,7 @@ function supportsLocalStorage() {
 }
 }
 
+//retrieve the historical Local data if any exists.
 function getExistingLocalData(playerName) {
     playerCount = localStorage.getItem('playerData');
     if(playerCount) {
@@ -86,6 +90,7 @@ function resetPlayerData() {
         playerName.value = "";
       });
     }
+    // display the form and remove the intro
   } else {
     introDiv.style.display = "none";
     formDiv.style.display = "block";
@@ -95,7 +100,37 @@ function resetPlayerData() {
 
 //get a random number and return the corresponding country/city object pair matching that number in the json list
 function getRandomObject() {
-  //find a number between 1 and 244
+  // check if the program has been run before.
+  // if(randomNumList.length === 0) {
+  //   //find a number between 1 and 244
+  //   const randomNum = Math.floor((Math.random() * 244) + 1);
+  //   randomNumList.push(randomNum);
+  // } else {
+  //   //if it has been run, make sure the randomNum chosen has not been used previously.
+  //     let randomNum = Math.floor((Math.random() * 244) + 1);
+  //     randomNumList.push(randomNum);
+  //     // when count reaches the length of randomNumList. exit the for loop
+  //     let count = 0;
+  //     for(i = 0; i < randomNumList.length; i += 1) {
+  //
+  //       //if it has been run previously. generate a new randomNum. and reset i counter.
+  //       if(randomNum === randomNumList[i]) {
+  //         let randomNum = Math.floor((Math.random() * 244) + 1);
+  //         randomNumList.push(randomNum);
+  //         i = 0;
+  //         count += 1;
+  //       }
+  //       //when all numbers have been cycled. its okay to repeat numbers.
+  //       if(count >= randomNumList.length) {
+  //         for(i = 0; i < listJSON.length; i += 1) {
+  //           const objectNum = listJSON[i].SNo;
+  //           if(randomNum === objectNum) {
+  //             return listJSON[i];
+  //           }
+  //         }
+  //       }
+  //     }
+  // }
   const randomNum = Math.floor((Math.random() * 244) + 1);
   for(i = 0; i < listJSON.length; i += 1) {
     const objectNum = listJSON[i].SNo;
@@ -109,6 +144,7 @@ function appendCountryName(countryObject) {
   countryName.textContent = countryObject.Country;
 }
 
+//create HTML to be dispalyed in the country card in resultsDiv
 function countryUlData(countryObject) {
   countryUl.firstElementChild.innerHTML = "<strong>Country:</strong> " + countryObject.Country;
   countryUl.firstElementChild.nextElementSibling.innerHTML = "<strong>Capital City:</strong> " + countryObject["Capital City"];
@@ -148,6 +184,8 @@ xhr.open('GET', 'https://raw.githubusercontent.com/Dannaroo/capital-city-quiz/gh
 // xhr.open('GET', 'country-city-list.json');
 xhr.send();
 
+
+// display the current player name on the intro page if current player exists
 if(supportsLocalStorage) {
   playerCount = JSON.parse(localStorage.getItem('playerData'));
   if(playerCount) {
@@ -155,14 +193,18 @@ if(supportsLocalStorage) {
   }
 }
 
+//ensure a player name is entered if player doesnt exist when start Button is clicked.
 startButton.addEventListener('click', (event) => {
   event.preventDefault();
+  //user has no playerName and playerCount does not exist. remove erro message
   if(playerName.value === "" && !playerCount) {
     nameErrorMessage.style.display = "";
     return;
   }
+  //get local storage data if local storage is supported
   if(supportsLocalStorage) {
     playerCount = getExistingLocalData(playerName.value);
+    //function resetPlayerData() will hide introDiv and show formDiv once the localStorage player name matches the one entered in the text field or the text field is left blank.
     resetPlayerData();
     updateCounterDiv();
 
@@ -171,6 +213,7 @@ startButton.addEventListener('click', (event) => {
   }// supports Local Storage
 });
 
+//check if the user answer matches the object answer and show the corresponding result div.
 submitButton.addEventListener('click', (event) => {
   event.preventDefault();
   let userResponse = cityNameInput.value.toUpperCase();
@@ -205,6 +248,7 @@ submitButton.addEventListener('click', (event) => {
   }
 });
 
+//generate a new question.
 playAgainButton.addEventListener('click', (event) => {
   event.preventDefault();
   resultDiv.style.display = "none";
@@ -214,4 +258,28 @@ playAgainButton.addEventListener('click', (event) => {
   formDiv.style.display = "";
   cityNameInput.value = "";
 
+});
+
+//skip the question and automatically fail.
+skipAndFailButton.addEventListener('click', (event) => {
+  event.preventDefault();
+  errorMessage.style.display = "none";
+  formDiv.style.display = "none";
+  resultDiv.style.display = "";
+  resultDivText.textContent = "Sorry, the correct answer is: " + countryObject["Capital City"];
+  resultDiv.className = "resultDivFailure text-center m-5 p-4";
+  playerCount.incorrect += 1;
+  updateLocalStorage(playerCount);
+  updateCounterDiv();
+
+});
+
+//return to intro and reload a new question.
+backToIntroButton.addEventListener('click', (event) => {
+  event.preventDefault();
+  countryObject = getRandomObject();
+  appendCountryName(countryObject);
+  countryUlData(countryObject);
+  introDiv.style.display = "";
+  resultDiv.style.display = "none";
 });
