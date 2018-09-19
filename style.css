@@ -14,7 +14,7 @@ h1 {
   text-shadow: .3rem .3rem .1rem black;
   color: #A2DED0;
   font-weight: 400;
-  font-size: 5rem;
+  font-size: 3rem;
 }
 
 #counterDiv {
@@ -111,6 +111,11 @@ body {
   line-height: 3rem;
 }
 
+.footer p {
+  font-size: .8rem;
+  line-height: 1.5;
+}
+
 
 
 
@@ -120,6 +125,13 @@ body {
 
 @media(min-width: 992px) {
 
+  h1 {
+    font-size: 5rem;
+  }
+
+  .footer p {
+    font-size: 1rem;
+  }
 
 
 }
