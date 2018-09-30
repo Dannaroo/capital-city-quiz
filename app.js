@@ -40,7 +40,8 @@ function getExistingLocalData(playerName) {
       playerCount = {
         'name' : playerName,
         'correct' : 0,
-        'incorrect' : 0
+        'incorrect' : 0,
+        'questionsAsked' : []
       }
       localStorage.setItem('playerData', JSON.stringify(playerCount));
       return playerCount;
@@ -100,44 +101,31 @@ function resetPlayerData() {
 
 //get a random number and return the corresponding country/city object pair matching that number in the json list
 function getRandomObject() {
-  // check if the program has been run before.
-  // if(randomNumList.length === 0) {
-  //   //find a number between 1 and 244
-  //   const randomNum = Math.floor((Math.random() * 244) + 1);
-  //   randomNumList.push(randomNum);
-  // } else {
-  //   //if it has been run, make sure the randomNum chosen has not been used previously.
-  //     let randomNum = Math.floor((Math.random() * 244) + 1);
-  //     randomNumList.push(randomNum);
-  //     // when count reaches the length of randomNumList. exit the for loop
-  //     let count = 0;
-  //     for(i = 0; i < randomNumList.length; i += 1) {
-  //
-  //       //if it has been run previously. generate a new randomNum. and reset i counter.
-  //       if(randomNum === randomNumList[i]) {
-  //         let randomNum = Math.floor((Math.random() * 244) + 1);
-  //         randomNumList.push(randomNum);
-  //         i = 0;
-  //         count += 1;
-  //       }
-  //       //when all numbers have been cycled. its okay to repeat numbers.
-  //       if(count >= randomNumList.length) {
-  //         for(i = 0; i < listJSON.length; i += 1) {
-  //           const objectNum = listJSON[i].SNo;
-  //           if(randomNum === objectNum) {
-  //             return listJSON[i];
-  //           }
-  //         }
-  //       }
-  //     }
-  // }
-  const randomNum = Math.floor((Math.random() * 244) + 1);
+
+  //generate a random number between 1 and 244
+  let randomNum = Math.floor((Math.random() * 244) + 1);
+
+// compare random number to questions already asked. if its been asked before, generate a new random number and start the loop again(so the whole list can be checked again against the new number). If the nuymber of questions asked is equal to the number of questions possible to be asked, reset the number of questions asked to 0.
+  for( let i = 0; i < playerCount['questionsAsked'].length; i += 1)
+    while(playerCount['questionsAsked'][i] === randomNum) {
+      if (playerCount['questionsAsked'].length === 244) {
+        playerCount['questionsAsked'] = [];
+      }
+      randomNum = Math.floor((Math.random() * 244) + 1);
+      i = 0;
+    }
+  // find the corresponding object for the random number generated and return the object
   for(i = 0; i < listJSON.length; i += 1) {
     const objectNum = listJSON[i].SNo;
     if(randomNum === objectNum) {
       return listJSON[i];
     }
   }
+}
+
+//fetch 5 random (incorrect) city names from the Json list to dispaly as multiple choice options.
+function getFiveCities() {
+
 }
 
 function appendCountryName(countryObject) {
@@ -246,6 +234,9 @@ submitButton.addEventListener('click', (event) => {
     updateLocalStorage(playerCount);
     updateCounterDiv();
   }
+  //record the countryObject in playerCount local data.
+  playerCount['questionsAsked'].push(countryObject.SNo);
+  updateLocalStorage(playerCount);
 });
 
 //generate a new question.
@@ -269,6 +260,7 @@ skipAndFailButton.addEventListener('click', (event) => {
   resultDivText.textContent = "Sorry, the correct answer is: " + countryObject["Capital City"];
   resultDiv.className = "resultDivFailure text-center m-5 p-4";
   playerCount.incorrect += 1;
+  playerCount['questionsAsked'].push(countryObject.SNo);
   updateLocalStorage(playerCount);
   updateCounterDiv();
 
